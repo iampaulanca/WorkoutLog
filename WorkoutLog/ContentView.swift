@@ -18,29 +18,18 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+            ScrollView {
+                VStack {
+                    ForEach(0...10, id: \.self) { i in
+                        VStack {
+                            
+                            Spacer()
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .ignoresSafeArea()
+                .padding(.top, 20)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    // Keep this
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        // modal to bring up another screen to add log
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }.navigationTitle("Log")
-            Text("Select an item")
         }
     }
 
@@ -85,6 +74,6 @@ private let itemFormatter: DateFormatter = {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView()
     }
 }
