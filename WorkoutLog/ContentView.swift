@@ -12,32 +12,130 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Log.startTime, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Item>
+    
+    private var logs: FetchedResults<Log>
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Exercise.name, ascending: true)],
+        animation: .default)
+    
+    private var exercises: FetchedResults<Exercise>
+
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack {
-                    ForEach(0...10, id: \.self) { i in
-                        VStack {
-                            
-                            Spacer()
-                        }
+            List {
+                ForEach(logs, id: \.self) { log in
+                    
+                    NavigationLink(destination:
+                                    LogView(log: log)
+                    ) {
+                        Text(log.startTime?.description ?? "")
                     }
                 }
-                .ignoresSafeArea()
-                .padding(.top, 20)
+                .onDelete { index in
+                    deleteItems(offsets: index)
+                }
+                
+            }
+            .navigationTitle("Select a player")
+            .toolbar {
+                Button("Add") {
+                    addItem()
+                }
+                Button("Delete ALl") {
+                    deleteAll()
+                }
+            }
+        }
+        NavigationView {
+            List {
+                ForEach(exercises, id: \.name) { exercise in
+                    Text(exercise.name ?? "")
+                }
+                .onDelete { index in
+                    deleteItems(offsets: index)
+                }
+
+            }
+            .navigationTitle("Select a player")
+            .toolbar {
+                Button("Add") {
+                    addItem()
+                }
+                Button("Delete ALl") {
+                    deleteAll()
+                }
+            }
+        }
+    }
+    private func deleteAll() {
+        withAnimation {
+            var entity = "Log"
+            let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+            
+            var entity1 = "Exercise"
+            let deleteFetch1 = NSFetchRequest<NSFetchRequestResult>(entityName: entity1)
+            let deleteRequest1 = NSBatchDeleteRequest(fetchRequest: deleteFetch1)
+            
+            deleteRequest.resultType = .resultTypeObjectIDs
+            deleteRequest1.resultType = .resultTypeObjectIDs
+            
+            do {
+                let batchDelete = try viewContext.execute(deleteRequest) as? NSBatchDeleteResult
+                let batchDelete1 = try viewContext.execute(deleteRequest1) as? NSBatchDeleteResult
+                
+                guard let deleteResult = batchDelete?.result
+                    as? [NSManagedObjectID]
+                    else { return }
+                
+                guard let deleteResult1 = batchDelete1?.result
+                    as? [NSManagedObjectID]
+                    else { return }
+                
+                let deletedObjects: [AnyHashable: Any] = [
+                    NSDeletedObjectsKey: deleteResult
+                ]
+                
+                let deletedObjects1: [AnyHashable: Any] = [
+                    NSDeletedObjectsKey: deleteResult1
+                ]
+                
+                NSManagedObjectContext.mergeChanges(
+                    fromRemoteContextSave: deletedObjects,
+                    into: [viewContext]
+                )
+                NSManagedObjectContext.mergeChanges(
+                    fromRemoteContextSave: deletedObjects1,
+                    into: [viewContext]
+                )
+                
+                try viewContext.save()
+            } catch {
+                print ("There was an error")
             }
         }
     }
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
+            Log.createWith(name: "Log",
+                           startTime: Date(),
+                           endtime: nil,
+                           bodyWeight: nil,
+                           exercises: nil,
+                           notes: nil,
+                           using: viewContext)
+            
+            Exercise.createWith(name: "Some Exercise",
+                                setNumber: 1,
+                                reps: nil,
+                                weight: nil,
+                                notes: nil,
+                                using: viewContext)
             do {
                 try viewContext.save()
             } catch {
@@ -51,7 +149,7 @@ struct ContentView: View {
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+            offsets.map { logs[$0] }.forEach(viewContext.delete)
 
             do {
                 try viewContext.save()

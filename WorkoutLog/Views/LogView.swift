@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct LogItem: View {
+struct LogView: View {
     @State private var height: CGFloat = 20.0
+    var log: Log
     var body: some View {
         HStack{
             VStack{
@@ -22,11 +23,9 @@ struct LogItem: View {
                     Text("Evening workout")
                         .bold()
                         .font(.title)
-                    ForEach(1...10, id: \.self) { i in
-                        Text("\(i)x Squat")
+                    ForEach(log.exercises ?? [], id: \.self) { exercise in
+                        Text("\(exercise)x Squat")
                     }
-                    
-                    
                 }
                 .overlay {
                     GeometryReader { geo in
@@ -57,9 +56,9 @@ struct HeightPreferenceKey: PreferenceKey {
     }
 
 }
-
-struct LogItem_Previews: PreviewProvider {
-    static var previews: some View {
-        LogItem()
-    }
-}
+//
+//struct LogItem_Previews: PreviewProvider {
+//    static var previews: some View {
+//        LogItem()
+//    }
+//}
