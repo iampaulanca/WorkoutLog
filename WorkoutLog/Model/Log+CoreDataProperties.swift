@@ -17,7 +17,7 @@ extension Log {
 
     @NSManaged public var bodyWeight: NSNumber?
     @NSManaged public var endTime: Date?
-    @NSManaged public var exercises: [Exercise]?
+    @NSManaged public var exerciseList: [Exercise]
     @NSManaged public var name: String?
     @NSManaged public var notes: String?
     @NSManaged public var startTime: Date?
@@ -26,15 +26,13 @@ extension Log {
                            startTime: Date? = Date(),
                            endtime: Date?,
                            bodyWeight: NSNumber? = nil,
-                           exercises: [Exercise]?,
                            notes: String?,
-                           using managedObjectContext: NSManagedObjectContext) {
+                           using managedObjectContext: NSManagedObjectContext) ->  Log {
         let log = Log(context: managedObjectContext)
         log.name = name
         log.startTime = startTime
         log.endTime = endtime
         log.bodyWeight = bodyWeight
-        log.exercises = exercises
         log.notes = notes
         
         do {
@@ -43,6 +41,8 @@ extension Log {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
+        
+        return log 
     }
 
 }

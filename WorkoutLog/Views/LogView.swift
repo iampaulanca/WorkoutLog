@@ -9,9 +9,22 @@ import SwiftUI
 
 struct LogView: View {
     @State private var height: CGFloat = 20.0
-    var log: Log
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @ObservedObject var log: Log
+    
     var body: some View {
+        
         HStack{
+            Button("Add Exercise") {
+                Exercise.createWith(in: log,
+                                    name: "Some New Exercise",
+                                    setNumber: 1,
+                                    reps: nil,
+                                    weight: nil,
+                                    notes: nil,
+                                    using: viewContext)
+            }
             VStack{
                 Text("Tue")
                 Text("20")
@@ -20,11 +33,13 @@ struct LogView: View {
             }
             .padding()
                 VStack(alignment: .leading) {
-                    Text("Evening workout")
-                        .bold()
-                        .font(.title)
-                    ForEach(log.exercises ?? [], id: \.self) { exercise in
-                        Text("\(exercise)x Squat")
+//                    Text("Evening workout")
+//                        .bold()
+//                        .font(.title)
+                    ForEach(log.exerciseList, id: \.self) { exercise in
+                        
+                        Text(exercise.name ?? "")
+                        
                     }
                 }
                 .overlay {
@@ -56,9 +71,12 @@ struct HeightPreferenceKey: PreferenceKey {
     }
 
 }
-//
-//struct LogItem_Previews: PreviewProvider {
-//    static var previews: some View {
-//        LogItem()
-//    }
-//}
+
+struct LogItem_Previews: PreviewProvider {
+    static var previews: some View {
+        let context = PersistenceController.preview.container.viewContext
+        let newLog = Log(context: context)
+        newLog.name = "LogView"
+        return LogView(log: newLog).environment(\.managedObjectContext, context)
+    }
+}
