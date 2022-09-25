@@ -8,6 +8,54 @@
 import Foundation
 import SwiftUI
 
+struct AddLogViewLogSection: View {
+    @Binding var name: String
+    @Binding var startTime: Date
+    @Binding var endTime: Date
+    @Binding var bodyWeight: String
+    @Binding var notes: String
+    
+    var body: some View {
+        TextField("Name", text: $name)
+        DatePicker(
+            "Start Time",
+            selection: $startTime,
+            displayedComponents: [.date, .hourAndMinute]
+        )
+        DatePicker(
+            "End Time",
+            selection: $endTime,
+            displayedComponents: [.date, .hourAndMinute]
+        )
+        TextField("BodyWeight", text: $bodyWeight)
+            .keyboardType(.decimalPad)
+        TextField("Notes", text: $notes)
+        
+    }
+    
+}
+
+struct AddLogViewAddLogSection: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    var name: String
+    var startTime: Date
+    var endTime: Date
+    var bodyWeight: String
+    var notes: String
+    @Binding var addingLog: Bool
+    var body: some View {
+        Button("Add") {
+            _ = Log.createWith(name: !self.name.isEmpty ? self.name : "Log",
+                                     startTime: Date(),
+                                     endtime: self.endTime,
+                                     bodyWeight: NSNumber(value: Double(self.bodyWeight) ?? 0),
+                                     notes: self.notes,
+                                     using: viewContext)
+            addingLog.toggle()
+        }
+    }
+}
+
 struct AddLogView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -19,35 +67,37 @@ struct AddLogView: View {
     @Binding var addingLog: Bool
     
     var body: some View {
-        Form {
-            TextField("Name", text: $name)
+        ZStack {
+            List {
+                Section {
+                    AddLogViewLogSection(name: $name,
+                                         startTime: $startTime,
+                                         endTime: $endTime,
+                                         bodyWeight: $bodyWeight,
+                                         notes: $notes)
+                }
+                
+                Section {
+                    HStack {
+                        Spacer()
+                        AddLogViewAddLogSection(name: name,
+                                                     startTime: startTime,
+                                                     endTime: endTime,
+                                                     bodyWeight: bodyWeight,
+                                                     notes: notes,
+                                                     addingLog: $addingLog)
+                        Spacer()
+                    }
+                    
+                }
+                
+            }
             
-            DatePicker(
-                "Start Time",
-                selection: $startTime,
-                displayedComponents: [.date, .hourAndMinute]
-            )
-
-            DatePicker(
-                "End Time",
-                selection: $endTime,
-                displayedComponents: [.date, .hourAndMinute]
-            )
-            
-            TextField("BodyWeight", text: $bodyWeight)
-                .keyboardType(.decimalPad)
-            
-            TextField("Notes", text: $notes)
             
         }
-        Button("Add Log") {
-            _ = Log.createWith(name: !self.name.isEmpty ? self.name : "Log",
-                                     startTime: Date(),
-                                     endtime: self.endTime,
-                                     bodyWeight: NSNumber(value: Double(self.bodyWeight) ?? 0),
-                                     notes: self.notes,
-                                     using: viewContext)
-            addingLog.toggle()
+        .onDisappear {
+            addingLog = false 
         }
+        
     }
 }

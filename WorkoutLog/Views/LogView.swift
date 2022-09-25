@@ -7,52 +7,7 @@
 
 import SwiftUI
 
-struct AddExerciseView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    var log: Log
-    @Binding var addingExercise: Bool
-    @State var name: String = ""
-    @State var reps: String = ""
-    @State var setNumber: String = ""
-    @State var weight: String = ""
-    @State var notes: String = ""
-    
-    var body: some View {
-        
-        VStack {
-            Text(log.name ?? "")
-            Text(log.startTime?.description ?? "")
-            Text(log.endTime?.description ?? "")
-            
-            ForEach(log.exerciseList, id: \.name) { exercise in
-                Text(exercise.name ?? "Default exercise name")
-            }
-            
-        }
-        
-        
-        Form {
-            TextField("Name", text: $name)
-            TextField("Reps", text: $reps)
-                .keyboardType(.numberPad)
-            TextField("Set Number", text: $setNumber)
-                .keyboardType(.numberPad)
-            TextField("Weight", text: $weight)
-                .keyboardType(.decimalPad)
-            TextField("Notes", text: $notes)
-        }
-        Button("Add Exercise") {
-            _ = Exercise.createWith(in: log,
-                                    name: !self.name.isEmpty ? self.name : "No Name",
-                                    setNumber: Int(self.setNumber) ?? 0,
-                                    reps: Int(self.reps) ?? 0,
-                                    weight: Double(self.weight) ?? 0.0,
-                                    notes: self.notes,
-                                    using: viewContext)
-            addingExercise.toggle()
-        }
-    }
-}
+
 
 
 struct LogView: View {
@@ -102,9 +57,10 @@ struct LogView: View {
         }
         .frame( height: self.height)
         .padding()
-        .sheet(isPresented: $addingExercise) {
+        .fullScreenCover(isPresented: $addingExercise, content: {
             AddExerciseView(log: log, addingExercise: $addingExercise)
-        }
+        })
+        
     }
 }
 

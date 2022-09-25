@@ -24,18 +24,25 @@ struct ContentView: View {
     let columns: [GridItem] = [ GridItem(.flexible(), spacing: nil, alignment: nil) ]
     
     var body: some View {
+        
+            
+        
         NavigationView {
             List {
+            
                 ForEach(logs, id: \.self) { log in
                     LogRow(log: log)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
+                        .font(.body)
                 }
                 .onDelete { indexSet in
                     deleteItems(offsets: indexSet)
                 }
             }
             .toolbar {
+                // Work around: Apple bug toolbar button not working after modal presented
+                Text(addingLog ? " " : "").hidden()
                 Button {
                     self.addingLog.toggle()
                 } label: {
@@ -44,12 +51,34 @@ struct ContentView: View {
             }
             .navigationTitle("Log")
         }
-        .sheet(isPresented: $addingLog) {
-            AddLogView(addingLog: $addingLog)
-        }
+        
+        
+//        HStack {
+//            Spacer()
+//            Button {
+//                self.addingLog.toggle()
+//                AddLogView(addingLog: $addingLog)
+//            } label: {
+//                Image(systemName: "plus.circle")
+//                    .foregroundColor(.blue)
+//            }
+//            Spacer()
+//        }
+//        .frame(height: 20)
+        
+        
         Button("Delete all") {
             deleteAll()
         }
+            
+        
+        .sheet(isPresented: $addingLog) {
+            AddLogView(addingLog: $addingLog)
+        }
+        
+        
+        
+        
     }
     private func deleteAll() {
         
