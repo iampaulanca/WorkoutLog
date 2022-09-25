@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LogView: View {
-    @State private var height: CGFloat = 20.0
+    @State private var height: CGFloat = 50
     @Environment(\.managedObjectContext) private var viewContext
     
     @ObservedObject var log: Log
@@ -16,15 +16,6 @@ struct LogView: View {
     var body: some View {
         
         HStack{
-            Button("Add Exercise") {
-                Exercise.createWith(in: log,
-                                    name: "Some New Exercise",
-                                    setNumber: 1,
-                                    reps: nil,
-                                    weight: nil,
-                                    notes: nil,
-                                    using: viewContext)
-            }
             VStack{
                 Text("Tue")
                 Text("20")
@@ -32,21 +23,23 @@ struct LogView: View {
                     .font(.title)
             }
             .padding()
-                VStack(alignment: .leading) {
-//                    Text("Evening workout")
-//                        .bold()
-//                        .font(.title)
-                    ForEach(log.exerciseList, id: \.self) { exercise in
-                        
-                        Text(exercise.name ?? "")
-                        
-                    }
+            VStack(alignment: .leading) {
+                Text("Evening Workout")
+                    .bold()
+                ForEach(log.exerciseList, id: \.self) { exercise in
+                    Text(exercise.reps != 0 ?
+                         "\(exercise.reps)x \(exercise.name ?? "")" :
+                            "1x\(exercise.name ?? "")")
+//                        .font(.body)
+//                        .lineLimit(1)
                 }
-                .overlay {
-                    GeometryReader { geo in
-                        Color.clear.preference(key: HeightPreferenceKey.self, value: geo.size.height)
-                    }
+                Spacer()
+            }
+            .overlay {
+                GeometryReader { geo in
+                    Color.clear.preference(key: HeightPreferenceKey.self, value: geo.size.height)
                 }
+            }
             
             Spacer()
             VStack {
@@ -55,11 +48,21 @@ struct LogView: View {
                     .foregroundColor(.gray)
             }
         }
+        .onTapGesture {
+            Exercise.createWith(in: log,
+                                name: "Squat",
+                                setNumber: 1,
+                                reps: 10,
+                                weight: nil,
+                                notes: nil,
+                                using: viewContext)
+            
+        }
         .onPreferenceChange(HeightPreferenceKey.self) { value in
             self.height = value
         }
-        .frame(height: self.height)
-        
+        .frame( height: self.height)
+        .padding()
     }
 }
 
@@ -69,7 +72,7 @@ struct HeightPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
-
+    
 }
 
 struct LogItem_Previews: PreviewProvider {
@@ -80,3 +83,4 @@ struct LogItem_Previews: PreviewProvider {
         return LogView(log: newLog).environment(\.managedObjectContext, context)
     }
 }
+

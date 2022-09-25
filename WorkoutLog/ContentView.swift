@@ -10,38 +10,46 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Log.startTime, ascending: true)],
         animation: .default)
     
     private var logs: FetchedResults<Log>
-
+    
+    let columns: [GridItem] = [ GridItem(.flexible(), spacing: nil, alignment: nil) ]
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(logs, id: \.self) { log in
-                    NavigationLink(destination:
-                                    LogView(log: log)
-                    ) {
-                        Text(log.startTime?.description ?? "")
-                    }
-                }
-                .onDelete { index in
-                    deleteItems(offsets: index)
-                }
+        
+        
+            NavigationView {
                 
+                    List(logs) { log in
+                        LogRow(log: log)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            
+                    }
+                    
+                    .toolbar {
+                        Button("add") {
+                            addItem()
+                        }
+                    }
+                    
+                
+                .navigationTitle("hello")
+
             }
-            .navigationTitle("Select a player")
-            .toolbar {
-                Button("Add") {
-                    addItem()
-                }
-                Button("Delete ALl") {
-                    deleteAll()
-                }
+            
+            
+            Button("Delete all") {
+                deleteAll()
             }
-        }
+        
+        
+        
+        
     }
     private func deleteAll() {
         
@@ -53,8 +61,8 @@ struct ContentView: View {
             do {
                 let batchDelete = try viewContext.execute(deleteRequest) as? NSBatchDeleteResult
                 guard let deleteResult = batchDelete?.result
-                    as? [NSManagedObjectID]
-                    else { return }
+                        as? [NSManagedObjectID]
+                else { return }
                 
                 
                 let deletedObjects: [AnyHashable: Any] = [
@@ -78,8 +86,8 @@ struct ContentView: View {
             do {
                 let batchDelete = try viewContext.execute(deleteRequest) as? NSBatchDeleteResult
                 guard let deleteResult = batchDelete?.result
-                    as? [NSManagedObjectID]
-                    else { return }
+                        as? [NSManagedObjectID]
+                else { return }
                 
                 
                 let deletedObjects: [AnyHashable: Any] = [
@@ -96,15 +104,15 @@ struct ContentView: View {
             }
         }
     }
-
+    
     private func addItem() {
         withAnimation {
             let log = Log.createWith(name: "Log",
-                           startTime: Date(),
-                           endtime: nil,
-                           bodyWeight: nil,
-                           notes: nil,
-                           using: viewContext)
+                                     startTime: Date(),
+                                     endtime: nil,
+                                     bodyWeight: nil,
+                                     notes: nil,
+                                     using: viewContext)
             do {
                 try viewContext.save()
             } catch {
@@ -115,11 +123,11 @@ struct ContentView: View {
             }
         }
     }
-
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { logs[$0] }.forEach(viewContext.delete)
-
+            
             do {
                 try viewContext.save()
             } catch {

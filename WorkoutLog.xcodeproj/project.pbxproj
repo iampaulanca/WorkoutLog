@@ -11,6 +11,7 @@
 		7865242628DD6CA80062B486 /* Log+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865242528DD6CA80062B486 /* Log+CoreDataClass.swift */; };
 		7865242928DEB6B30062B486 /* Exercise+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865242728DEB6B30062B486 /* Exercise+CoreDataClass.swift */; };
 		7865242A28DEB6B30062B486 /* Exercise+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865242828DEB6B30062B486 /* Exercise+CoreDataProperties.swift */; };
+		7865243428DFC6F60062B486 /* LogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7865243328DFC6F60062B486 /* LogRow.swift */; };
 		78A5DB8F28DACFF000363E50 /* WorkoutLogApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78A5DB8E28DACFF000363E50 /* WorkoutLogApp.swift */; };
 		78A5DB9128DACFF000363E50 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78A5DB9028DACFF000363E50 /* ContentView.swift */; };
 		78A5DB9328DACFF100363E50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 78A5DB9228DACFF100363E50 /* Assets.xcassets */; };
@@ -25,6 +26,7 @@
 		7865242528DD6CA80062B486 /* Log+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Log+CoreDataClass.swift"; sourceTree = "<group>"; };
 		7865242728DEB6B30062B486 /* Exercise+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Exercise+CoreDataClass.swift"; path = "WorkoutLog/Exercise+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		7865242828DEB6B30062B486 /* Exercise+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Exercise+CoreDataProperties.swift"; path = "WorkoutLog/Exercise+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		7865243328DFC6F60062B486 /* LogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRow.swift; sourceTree = "<group>"; };
 		78A5DB8B28DACFF000363E50 /* WorkoutLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorkoutLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78A5DB8E28DACFF000363E50 /* WorkoutLogApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLogApp.swift; sourceTree = "<group>"; };
 		78A5DB9028DACFF000363E50 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				78A5DBA228DAD36B00363E50 /* LogView.swift */,
+				7865243328DFC6F60062B486 /* LogRow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -183,6 +186,7 @@
 				7865242A28DEB6B30062B486 /* Exercise+CoreDataProperties.swift in Sources */,
 				7865242428DD6B580062B486 /* Log+CoreDataProperties.swift in Sources */,
 				78A5DB8F28DACFF000363E50 /* WorkoutLogApp.swift in Sources */,
+				7865243428DFC6F60062B486 /* LogRow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
