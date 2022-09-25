@@ -25,7 +25,6 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            
             List {
                 ForEach(logs, id: \.self) { log in
                     LogRow(log: log)
@@ -36,8 +35,6 @@ struct ContentView: View {
                     deleteItems(offsets: indexSet)
                 }
             }
-           
-            
             .toolbar {
                 Button {
                     self.addingLog.toggle()
