@@ -12,6 +12,7 @@ struct LogView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @ObservedObject var log: Log
+    @State var addExercise = false
     
     var body: some View {
         
@@ -24,14 +25,12 @@ struct LogView: View {
             }
             .padding()
             VStack(alignment: .leading) {
-                Text("Evening Workout")
+                Text(log.name ?? "Log")
                     .bold()
                 ForEach(log.exerciseList, id: \.self) { exercise in
                     Text(exercise.reps != 0 ?
                          "\(exercise.reps)x \(exercise.name ?? "")" :
                             "1x\(exercise.name ?? "")")
-//                        .font(.body)
-//                        .lineLimit(1)
                 }
                 Spacer()
             }
@@ -49,13 +48,15 @@ struct LogView: View {
             }
         }
         .onTapGesture {
-            Exercise.createWith(in: log,
-                                name: "Squat",
-                                setNumber: 1,
-                                reps: 10,
-                                weight: nil,
-                                notes: nil,
-                                using: viewContext)
+//            addExercise.toggle()
+            
+//            Exercise.createWith(in: log,
+//                                name: "Squat",
+//                                setNumber: 1,
+//                                reps: 10,
+//                                weight: nil,
+//                                notes: nil,
+//                                using: viewContext)
             
         }
         .onPreferenceChange(HeightPreferenceKey.self) { value in
@@ -63,6 +64,10 @@ struct LogView: View {
         }
         .frame( height: self.height)
         .padding()
+//        .sheet(isPresented: $addLog) {
+//            AddLogView(log: log)
+//            AddExerciseView(log: log)
+//        }
     }
 }
 

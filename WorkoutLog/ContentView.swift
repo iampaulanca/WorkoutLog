@@ -8,6 +8,8 @@
 import SwiftUI
 import CoreData
 
+
+
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -17,39 +19,40 @@ struct ContentView: View {
     
     private var logs: FetchedResults<Log>
     
+    @State var addingLog: Bool = false
+    
     let columns: [GridItem] = [ GridItem(.flexible(), spacing: nil, alignment: nil) ]
     
     var body: some View {
-        
-        
-            NavigationView {
-                
-                    List(logs) { log in
-                        LogRow(log: log)
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                            
-                    }
-                    
-                    .toolbar {
-                        Button("add") {
-                            addItem()
-                        }
-                    }
-                    
-                
-                .navigationTitle("hello")
-
-            }
+        NavigationView {
             
-            
-            Button("Delete all") {
-                deleteAll()
+            List {
+                ForEach(logs, id: \.self) { log in
+                    LogRow(log: log)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
+                .onDelete { indexSet in
+                    deleteItems(offsets: indexSet)
+                }
             }
-        
-        
-        
-        
+           
+            
+            .toolbar {
+                Button {
+                    self.addingLog.toggle()
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            .navigationTitle("Log")
+        }
+        .sheet(isPresented: $addingLog) {
+            AddLogView(addingLog: $addingLog)
+        }
+        Button("Delete all") {
+            deleteAll()
+        }
     }
     private func deleteAll() {
         
