@@ -81,11 +81,13 @@ struct AddExerciseView: View {
                         
                 }
                 
-                ForEach(collection.keys.sorted(by: >), id: \.self) { key in
+                // Sort by keys first of different workout
+                ForEach(collection.keys.sorted(by: <), id: \.self) { key in
                     
+                    // get individual workouts
                     Section {
-                        ForEach(collection[key] ?? []) { val in
-                            Text(val.name ?? "")
+                        ForEach(collection[key]?.sorted(by: {$0.setNumber < $1.setNumber }) ?? []) { val in
+                            Text("\(val.name ?? "") Reps: \(val.reps ) weight: \(String(format: "%.1f", val.weight))")
                         }
                     }
                     
@@ -93,12 +95,12 @@ struct AddExerciseView: View {
 
 
                 Button("Add Exercise") {
-                    
+                    AddExerciseView(log: log, addingExercise: $addingExercise)
                     _ = Exercise.createWith(in: log,
-                                            name: !self.exerciseName.isEmpty ? self.exerciseName : "No Name",
-                                            setNumber: Int(self.setNumber) ?? 0,
-                                            reps: Int(self.reps) ?? 0,
-                                            weight: Double(self.weight) ?? 0.0,
+                                            name: !self.exerciseName.isEmpty ? self.exerciseName : "Benching",
+                                            setNumber: Int(self.setNumber) ?? 1,
+                                            reps: Int(self.reps) ?? 10,
+                                            weight: Double(self.weight) ?? 135,
                                             notes: self.notes,
                                             using: viewContext)
                     addingExercise.toggle()
