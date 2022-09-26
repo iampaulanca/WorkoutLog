@@ -84,12 +84,18 @@ struct AddExerciseView: View {
                 // Sort by keys first of different workout
                 ForEach(collection.keys.sorted(by: <), id: \.self) { key in
                     
+                    
                     // get individual workouts
-                    Section {
+                    Section(key) {
                         ForEach(collection[key]?.sorted(by: {$0.setNumber < $1.setNumber }) ?? []) { val in
-                            Text("\(val.name ?? "") Reps: \(val.reps ) weight: \(String(format: "%.1f", val.weight))")
+                            // Create special view
+                            Text("setNumber: \(val.setNumber) weight: \(String(format: "%.1f", val.weight)) Reps: \(val.reps ) Notes: \(val.notes ?? "")")
+                                .padding()
+                                .minimumScaleFactor(0.5)
+                                .lineLimit(2)
                         }
                     }
+                    
                     
                 }
 
