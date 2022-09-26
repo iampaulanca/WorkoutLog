@@ -7,6 +7,70 @@
 
 import Foundation
 import SwiftUI
+import CoreData
+
+struct AddLogView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @State var name: String = ""
+    @State var startTime: Date = Date()
+    @State var endTime: Date = Date() 
+    @State var bodyWeight: String = ""
+    @State var notes: String = ""
+    @Binding var addingLog: Bool
+    
+    var body: some View {
+        ZStack {
+            VStack {
+                AddLogViewNavbar(addingLog: $addingLog) {
+                    Button {
+                        addLog(name: name,
+                               startTime: startTime,
+                               endTime: endTime,
+                               bodyWeight: bodyWeight,
+                               notes: notes,
+                               viewContext: viewContext)
+                    } label: {
+                        Image(systemName: "plus.circle")
+                    }
+                    .padding()
+                }
+                List {
+                    Section {
+                        AddLogViewLogSection(name: $name,
+                                             startTime: $startTime,
+                                             endTime: $endTime,
+                                             bodyWeight: $bodyWeight,
+                                             notes: $notes)
+                    }
+                    
+                    Section {
+                            AddLogViewCancelSection(addingLog: $addingLog)
+                    }
+                }
+            }
+            
+            
+        }
+        .onDisappear {
+            addingLog = false 
+        }
+        
+    }
+    
+    private func addLog(name:String, startTime: Date, endTime: Date, bodyWeight: String, notes: String, viewContext: NSManagedObjectContext) {
+
+        _ = Log.createWith(name: !name.isEmpty ? self.name : "Log",
+                           startTime: Date(),
+                           endtime: self.endTime,
+                           bodyWeight: NSNumber(value: Double(self.bodyWeight) ?? 0),
+                           notes: self.notes,
+                           using: viewContext)
+        self.addingLog.toggle()
+    }
+}
+
+//MARK: Sections of the for Add Log view
 
 struct AddLogViewLogSection: View {
     @Binding var name: String
@@ -35,69 +99,36 @@ struct AddLogViewLogSection: View {
     
 }
 
-struct AddLogViewAddLogSection: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    var name: String
-    var startTime: Date
-    var endTime: Date
-    var bodyWeight: String
-    var notes: String
+struct AddLogViewCancelSection: View {
     @Binding var addingLog: Bool
     var body: some View {
-        Button("Add") {
-            _ = Log.createWith(name: !self.name.isEmpty ? self.name : "Log",
-                                     startTime: Date(),
-                                     endtime: self.endTime,
-                                     bodyWeight: NSNumber(value: Double(self.bodyWeight) ?? 0),
-                                     notes: self.notes,
-                                     using: viewContext)
-            addingLog.toggle()
+        HStack {
+            Spacer()
+            Button("Cancel") {
+                addingLog.toggle()
+            }
+            .foregroundColor(Color.red)
+            Spacer()
         }
+        
     }
 }
 
-struct AddLogView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @State var name: String = ""
-    @State var startTime: Date = Date()
-    @State var endTime: Date = Date()
-    @State var bodyWeight: String = ""
-    @State var notes: String = ""
+struct AddLogViewNavbar<Content: View>: View {
     @Binding var addingLog: Bool
-    
+    let content: Content
+    init(addingLog: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self._addingLog = addingLog
+        self.content = content()
+    }
     var body: some View {
-        ZStack {
-            List {
-                Section {
-                    AddLogViewLogSection(name: $name,
-                                         startTime: $startTime,
-                                         endTime: $endTime,
-                                         bodyWeight: $bodyWeight,
-                                         notes: $notes)
-                }
-                
-                Section {
-                    HStack {
-                        Spacer()
-                        AddLogViewAddLogSection(name: name,
-                                                     startTime: startTime,
-                                                     endTime: endTime,
-                                                     bodyWeight: bodyWeight,
-                                                     notes: notes,
-                                                     addingLog: $addingLog)
-                        Spacer()
-                    }
-                    
-                }
-                
-            }
-            
-            
+        HStack {
+            Text("New Workout Log")
+                .font(.title)
+                .bold()
+                .padding()
+            Spacer()
+            content
         }
-        .onDisappear {
-            addingLog = false 
-        }
-        
     }
 }

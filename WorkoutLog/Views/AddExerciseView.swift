@@ -14,49 +14,113 @@ struct AddExerciseView: View {
     @Environment(\.managedObjectContext) private var viewContext
     var log: Log
     @Binding var addingExercise: Bool
-    @State var name: String = ""
+    
     @State var reps: String = ""
+    
+    
     @State var setNumber: String = ""
     @State var weight: String = ""
-    @State var notes: String = ""
+    
+    @State var logName: String
+    @State var exerciseName: String = ""
+    @State var startTime: Date
+    @State var endTime: Date
+    @State var bodyWeight: String
+    @State var notes: String
+    
+    
+    private enum Field: Int, CaseIterable {
+        case name, notes, bodyWeight
+    }
+    @FocusState private var focusedField: Field?
+    var collection = [String: [Exercise]]()
+    init(log: Log, addingExercise: Binding<Bool>) {
+        self.log = log
+        self._addingExercise = addingExercise
+        _logName = .init(initialValue: log.name ?? "")
+        _startTime = .init(initialValue: log.startTime ?? Date())
+        _endTime = .init(initialValue: log.endTime ?? Date())
+        _bodyWeight = .init(initialValue: log.bodyWeight?.description ?? "NA")
+        _notes = .init(initialValue: log.notes ?? "")
+        
+        for exercise in log.exerciseList {
+            collection[exercise.name ?? "", default: []].append(exercise)
+        }
+        
+    }
     
     var body: some View {
         
         AddExerciseNavBar(addingExercise: $addingExercise, log: log)
         
-        
-        List {
-            Section {
-                TextField("Name", text: $name)
-                TextField("Reps", text: $reps)
-                    .keyboardType(.numberPad)
-                TextField("Set Number", text: $setNumber)
-                    .keyboardType(.numberPad)
-                TextField("Weight", text: $weight)
-                    .keyboardType(.decimalPad)
-                TextField("Notes", text: $notes)
-            }
-            
-            ForEach(Array(Set(log.exerciseList))) { exercise in
-                Text(exercise.name ?? "No name")
-            }.onDelete { indexSet in
-                // delete exercise
-                print("delete exercise")
-                deleteItems(offsets: indexSet)
-            }
-
-            Button("Add Exercise") {
+        NavigationView {
+            List {
                 
-                _ = Exercise.createWith(in: log,
-                                        name: !self.name.isEmpty ? self.name : "No Name",
-                                        setNumber: Int(self.setNumber) ?? 0,
-                                        reps: Int(self.reps) ?? 0,
-                                        weight: Double(self.weight) ?? 0.0,
-                                        notes: self.notes,
-                                        using: viewContext)
-                addingExercise.toggle()
+                Section {
+                    TextField("Name", text: $logName)
+                        .focused($focusedField, equals: .name)
+                    
+                    DatePicker(
+                        "Start Time",
+                        selection: $startTime,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    
+                    DatePicker(
+                        "End Time",
+                        selection: $endTime,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    
+                    TextField("BodyWeight", text: $bodyWeight)
+                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .bodyWeight)
+
+                    TextField("Notes", text: $notes)
+                        .focused($focusedField, equals: .notes)
+                        
+                }
+                
+                ForEach(collection.keys.sorted(by: >), id: \.self) { key in
+                    
+                    Section {
+                        ForEach(collection[key] ?? []) { val in
+                            Text(val.name ?? "")
+                        }
+                    }
+                    
+                }
+
+
+                Button("Add Exercise") {
+                    
+                    _ = Exercise.createWith(in: log,
+                                            name: !self.exerciseName.isEmpty ? self.exerciseName : "No Name",
+                                            setNumber: Int(self.setNumber) ?? 0,
+                                            reps: Int(self.reps) ?? 0,
+                                            weight: Double(self.weight) ?? 0.0,
+                                            notes: self.notes,
+                                            using: viewContext)
+                    addingExercise.toggle()
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .keyboard) {
+                    HStack {
+
+                        Button {
+                            focusedField = nil
+                        } label: {
+                            Image(systemName: "keyboard.chevron.compact.down")
+                        }
+                        Spacer()
+                    }
+                }
             }
         }
+        
+        
+        
         
     }
     

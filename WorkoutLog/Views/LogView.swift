@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-
-
-
 struct LogView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
